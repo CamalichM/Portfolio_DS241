@@ -1,0 +1,97 @@
+---
+title: "nyc_flight_data"
+date:   "2023-09-06"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code.
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*.
+
+ 
+```{r}
+plot(cars)
+```
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
+```{r}
+library(nycflights13)
+library(tidyverse)
+library(janitor)
+library(here)
+```
+
+ 
+
+```{r}
+flights
+```
+```{r}
+glimpse(flights)
+```
+```{r}
+head(flights)
+```
+
+ 
+
+```{r}
+df1=flights
+df2=df1 |>
+  filter(month == 9, origin == "MIA")
+df3=df1 |>
+  filter(month == 9, dest == "MIA")
+df4=df1 |>
+  filter(month == 1, dest == "MIA") 
+df5=df1 |>
+  filter(month >= 6 & month <= 8, dest == "ORD" | dest == "MDW")
+```
+
+For flights to MIAMI in September, find the unique flight numbers.
+```{r}
+df3_unique=df3[!duplicated(df3$flight), ]
+df3_unique$flight
+```
+Create a dataframe df6 composed of flights to Miami with a flight number matching the smallest flight number from the set above.
+```{r}
+df6 = df3 |> filter(flight==min(df3$flight))
+head(df6)
+```
+Create a visualization (using ggplot) to show the DELAYS associated with this flight number.
+```{r}
+ggplot(data=df6, mapping=aes(x=dep_delay, y=arr_delay)) + geom_point()
+```
+Create ANOTHER visualization that helps to understand the relationship between the arrival delay and the departure delay.   Try to find something interesting to say.
+
+**A scatter plot is an effective tool for contrasting the relationship between arrival delay and departure delay for several reasons. Firstly, it represents individual data points which display each pair of data as a point on the graph, enabling a clear view of data distribution and dispersion. Additionally, it aids in identifying visual patterns, such as the general trend of points clustering in a specific direction as well as detection of correlations. Also, scatter plots facilitate the detection of outliers, which reveal exceptional situations in the flights. The dots observable in the graph below lllustrate the correlation between the rows, and allow decision makers to get a quick and easy visual comparison between variables, making trends and discrepancies easily identifiable.**
+```{r}
+plot(df6$dep_delay, df6$arr_delay,
+     xlab = "Departure Delay",
+     ylab = "Arrival Delay",
+     main = "Relationship between the Arrival Delay and Departure Delay")
+```
+```{r}
+df7=df1 |> filter(dest=="MIA", origin=="LGA") |> mutate(flt_delta=arr_delay-dep_delay)
+```
+
+```{r}
+df7 |> ggplot(aes(x=time_hour,y=dep_delay)) + geom_point(alpha=.1)
+```
+```{r}
+df7 |> ggplot(aes(x=time_hour,y=dep_delay)) + geom_point(alpha=.1)+stat_smooth()+ylim(-25,120)
+```
+```{r}
+df7 |> ggplot(aes(x=hour+minute/60,y=dep_delay)) + geom_point(alpha=.1)+stat_smooth()+ylim(-25,120)
+```
+```{r}
+df7 |> 
+mutate(day_of_week=weekdays(time_hour)) |> ggplot(aes(x=hour+minute/60,y=dep_delay,color(day_of_week))) + geom_point(alpha=.1)+
+stat_smooth()+
+ylim(-25,120)
+```
+
+
