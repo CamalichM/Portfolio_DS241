@@ -1,0 +1,120 @@
+---
+title: "Spatial Joins"
+output: html_document
+date: "2023-11-15"
+author: "Marco Camalich"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(knitr)
+library(tidyverse)
+library(janitor)
+library(lubridate)
+library(here)
+library(sf)
+library(tmap)
+library(tidycensus)
+library(kableExtra)
+```
+
+## Import Dataset 
+```{r}
+neigh = st_read(here("data_raw","DC_Health_Planning_Neighborhoods.geojson")) %>% clean_names()
+```
+
+```{r}
+plot(neigh)
+```
+
+## Investigating Joining Spatial and Non-Spatial Data
+```{r}
+dc_c = read_csv(here("data_raw","DC_COVID-19_Total_Positive_Cases_by_Neighborhood.csv")) %>% clean_names()
+```
+
+
+```{r}
+df_cases=dc_c %>%
+  filter(as_date(date_reported) == "2021-11-17") %>% 
+  separate(neighborhood,into=c("code","name"),sep = ":") %>%
+  mutate(code=case_when(code=="N35" ~"N0",
+                        TRUE ~ code)) %>%
+  select(-date_reported)
+
+```
+
+```{r}
+neigh2 = left_join(neigh, df_cases, by=c("code"))
+tmap_mode("view")
+tm_shape(neigh2) +tm_polygons("total_positives", alpha = .5)
+```
+
+```{r}
+df_census = get_acs(geography = "tract",
+                    variables = c("median_inc"="B06011_001",
+                                  "pop" = "B01003_001E",
+                                  "pop_black" = "B02009_001"),
+                    state = "DC", geometry = TRUE, year = 2021)
+```
+
+```{r}
+class(df_census)
+plot(df_census)
+```
+```{r}
+dc_cases_filtered <- dc_c %>%
+  filter(as.Date(date_reported) == as.Date("2021-11-17")) %>%
+  separate(neighborhood, into = c("code", "name"), sep = ":") %>%
+  mutate(code = case_when(code == "N35" ~ "N0", TRUE ~ code)) %>%
+  select(-date_reported)
+
+df_combined <- left_join(dc_cases_filtered, df_census, by = c("code" = "GEOID"))
+
+neigh_with_crime <- left_join(neigh, df_combined, by = "code")
+
+tmap_mode("view")
+tm_shape(neigh_with_crime) +
+  tm_bubbles(size = "total_positives", col = "total_positives", alpha = 0.7) +
+  tm_borders() +
+  tm_layout(title = "Total Positives and Demographic Data by Neighborhood")
+```
+```{r}
+tm_shape(neigh_with_crime) +
+  tm_bubbles(size = "total_positives", col = "total_positives", alpha = 0.7) +
+  tm_borders() +
+  tm_shape(df_census) +
+  tm_fill("estimate", style = "cont") +  # Use style "cont" for continuous variables
+  tm_borders() +
+  tm_layout(title = "Estimates: District of Columbia 2021")
+```
+```{r}
+dc_c$date_reported <- as.Date(dc_c$date_reported)
+
+neighborhood_totals <- dc_c %>%
+  group_by(neighborhood) %>%
+  summarize(total_positives = sum(total_positives, na.rm = TRUE)) %>%
+  filter(!is.na(neighborhood) & !grepl("^unknown$", neighborhood, ignore.case = TRUE))  
+
+sorted_neighborhoods <- neighborhood_totals %>% arrange(total_positives)
+
+cat("Neighborhoods with the Least Amount of Total Positives:\n")
+least_5 <- head(sorted_neighborhoods, 5)
+for (i in 1:5) {
+  cat("\"", least_5$neighborhood[i], "\": ", least_5$total_positives[i], "\n", sep = "")
+}
+cat("\n")
+cat("Neighborhoods with the Most Amount of Total Positives:\n")
+most_5 <- tail(sorted_neighborhoods, 5)
+for (i in 1:5) {
+  cat("\"", most_5$neighborhood[i], "\": ", most_5$total_positives[i], "\n", sep = "")
+}
+
+```
+
+
+
+
+
