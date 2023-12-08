@@ -244,19 +244,4 @@ ggplot(dn_lq, mapping = aes(x = longitude, y = latitude, color = establishment))
   geom_point()
 ```
 
-The following two questions ask you to create visualizations.
-These should follow best practices you learned in class, such as informative titles, axis labels, etc.
-See <http://ggplot2.tidyverse.org/reference/labs.html> for help with the syntax.
-You can also choose different themes to change the overall look of your plots, see <http://ggplot2.tidyverse.org/reference/ggtheme.html> for help with these.
 
-11. Filter the data for observations in North Carolina only, and recreate the plot.
-    You should also adjust the transparency of the points, by setting the `alpha` level, so that it's easier to see the overplotted ones.
-    Visually, does Mitch Hedberg's joke appear to hold here?
-
-12. Now filter the data for observations in Texas only, and recreate the plot, with an appropriate `alpha` level.
-    Visually, does Mitch Hedberg's joke appear to hold here?
-
-That's it for now!
-In the next lab we will take a more quantitative approach to answering these questions.
-
-🧶 ✅ ⬆️ Knit, *commit, and push your changes to GitHub with an appropriate commit message. Make sure to commit and push all changed files so that your Git pane is cleared up afterwards and review the md document on GitHub to make sure you're happy with the final state of your work.*
