@@ -5,7 +5,9 @@ The following archives are a collection of the representative coding work elabor
 
 It's mainly based on the programming language "R", which is mainly used for data tidying and analysis. 
 
-#### Some of the main skills demonstrated in the following portfolio are:
+Some of the work done in the repository includes NYC flight analysis, enrollment predictions, DC bikeshare examination for future decision-making, restaurant/hotel territorial calculations, etc.
+
+#### The main skills demonstrated in the following portfolio are:
 
 -Visualizing data using ggplot2 (scatterplot, histogram, barchart, lineplot).
 
