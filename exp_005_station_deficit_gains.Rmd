@@ -3,7 +3,6 @@ title: "Bike station deficits/gains"
 output: html_notebook
 Authors: "Marco Camalich, Joshua Alessio and Kashyap Vallur"
 ---
-
 ```{r}
 library(tidyverse)
 library(janitor)
