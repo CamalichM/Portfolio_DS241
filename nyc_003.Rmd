@@ -1,0 +1,59 @@
+---
+title: "Experiment 4:"
+subtitle: "In class work"
+date:   "2023-09-12"
+output: html_notebook
+author: "Marco Camalich"
+---
+```{r}
+library(nycflights13)
+library(tidyverse)
+library(janitor)
+library(here)
+```
+
+```{r}
+df2017=read_csv(here("data_raw","DL_SelectFields_2017.zip")) |> clean_names()
+df2018=read_csv(here("data_raw","DL_SelectFields_2018.zip")) |> clean_names()
+df2019=read_csv(here("data_raw","DL_SelectFields_2019.zip")) |> clean_names()
+df2020=read_csv(here("data_raw","DL_SelectFields_2020.zip")) |> clean_names()
+df2021=read_csv(here("data_raw","DL_SelectFields_2021.zip")) |> clean_names()
+df2022=read_csv(here("data_raw","DL_SelectFields_2022.zip")) |> clean_names()
+df2023=read_csv(here("data_raw","DL_SelectFields_2023.zip")) |> clean_names()
+dfc=bind_rows(df2017,df2018,df2019,df2020,df2021,df2022,df2023)
+dfc
+```
+```{r}
+df9=dfc |> filter(passengers>0,origin=="LGA")
+```
+
+```{r}
+df9 |> ggplot(aes(month)) + geom_bar()
+```
+```{r}
+df9 |> ggplot(aes(month)) + geom_bar(aes(weight=passengers))
+```
+```{r}
+df9 |> ggplot(aes(year)) + geom_bar(aes(weight=passengers))
+```
+
+```{r}
+df9 |> ggplot(aes(month, fill=carrier_name)) + geom_bar(aes(weight=departures_performed))
+```
+```{r}
+df10=dfc |> filter(passengers>0,origin=="LGA" | dest=="LGA")
+df10 |> ggplot(aes(month)) + geom_bar(aes(weight=passengers))
+```
+```{r}
+df11=df10 |> select(month,passengers, seats, carrier_name, dest, origin)
+```
+
+```{r}
+df12=df10 |> select(1:5, month, contains("id"))
+```
+
+```{r}
+df13=df11 |> mutate(percent_loading = passengers/seats*100)
+df13 |> ggplot(aes(percent_loading)) + geom_histogram()+facet_wrap(~carrier_name,scales="free_y")
+```
+
