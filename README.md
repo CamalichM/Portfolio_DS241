@@ -1,6 +1,6 @@
 # Portfolio_DS241
 ## Marco Antonio Camalich Pérez
-### DS241: Intro to Data Science
+### DS241: Data Science
 The following archives are a collection of the representative coding work elaborated since the beggining of the semester. 
 
 It's mainly based on the programming language "R", which is mainly used for data tidying and analysis. 
